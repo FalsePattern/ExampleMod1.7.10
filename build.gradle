@@ -1,9 +1,9 @@
-//version: 29197fa3cf1ea6ef5c07884a613171d01c026d1d
+//version: 1641429628falsepattern12
 /*
 DO NOT CHANGE THIS FILE!
 
 Also, you may replace this file at any time if there is an update available.
-Please check https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/build.gradle for updates.
+Please check https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/build.gradle for updates.
  */
 
 
@@ -28,11 +28,11 @@ buildscript {
         }
         maven {
             name = "jitpack"
-            url = "https://jitpack.io"
+            url = "https://jitpack.falsepattern.com/"
         }
     }
     dependencies {
-        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.4'
+        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.6'
     }
 }
 
@@ -87,6 +87,14 @@ checkPropertyExists("coreModClass")
 checkPropertyExists("containsMixinsAndOrCoreModOnly")
 checkPropertyExists("usesShadowedDependencies")
 checkPropertyExists("developmentEnvironmentUserName")
+
+//Properties added in fork
+checkPropertyExists("skipBuildScriptUpdateCheck")
+checkPropertyExists("repositoryURL")
+checkPropertyExists("repositoryName")
+checkPropertyExists("mavenGroupId")
+checkPropertyExists("mavenArtifactId")
+checkPropertyExists("hasMixinDeps")
 
 
 String javaSourceDir = "src/main/java/"
@@ -153,7 +161,7 @@ configurations.all {
 'git config core.fileMode false'.execute()
 // Pulls version from git tag
 try {
-    version = minecraftVersion + "-" + gitVersion()
+    version = gitVersion()
 }
 catch (Exception e) {
     throw new IllegalStateException("This mod must be version controlled by Git AND the repository must provide at least one tag!");
@@ -166,6 +174,7 @@ if(project.hasProperty("customArchiveBaseName") && customArchiveBaseName) {
 else {
     archivesBaseName = modId
 }
+archivesBaseName += "-mc" + minecraftVersion
 
 minecraft {
     version = minecraftVersion + "-" + forgeVersion + "-" + minecraftVersion
@@ -195,7 +204,9 @@ if(file("addon.gradle").exists()) {
 apply from: 'repositories.gradle'
 
 configurations {
-    implementation.extendsFrom(shadowImplementation)
+    implementation.extendsFrom(shadowImplementation)  // TODO: remove after all uses are refactored
+    implementation.extendsFrom(shadowCompile)
+    implementation.extendsFrom(shadeCompile)
 }
 
 repositories {
@@ -203,13 +214,13 @@ repositories {
         name = "Overmind forge repo mirror"
         url = "https://gregtech.overminddl1.com/"
     }
-    if(usesMixins.toBoolean()) {
+    if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
         maven {
             name = "sponge"
-            url = "https://repo.spongepowered.org/repository/maven-public"
+            url = "https://sponge.falsepattern.com/"
         }
         maven {
-            url = "https://jitpack.io"
+            url = "https://jitpack.falsepattern.com/"
         }
     }
 }
@@ -230,6 +241,17 @@ dependencies {
             exclude module: "log4j-core"
         }
         compile("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
+    }
+    if(hasMixinDeps.toBoolean()) {
+        runtime("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+            // Mixin includes a lot of dependencies that are too up-to-date
+            exclude module: "launchwrapper"
+            exclude module: "guava"
+            exclude module: "gson"
+            exclude module: "commons-io"
+            exclude module: "log4j-core"
+        }
+        runtime("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
     }
 }
 
@@ -261,16 +283,28 @@ task relocateShadowJar(type: ConfigureShadowRelocation) {
 }
 
 shadowJar {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     manifest {
         attributes(getManifestAttributes())
     }
 
     minimize()  // This will only allow shading for actually used classes
-    configurations = [project.configurations.shadowImplementation]
+    configurations = [project.configurations.shadowImplementation, project.configurations.shadowCompile]
     dependsOn(relocateShadowJar)
 }
 
 jar {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     manifest {
         attributes(getManifestAttributes())
     }
@@ -304,11 +338,20 @@ afterEvaluate {
 
 runClient {
     def arguments = []
+    def jvmArguments = []
 
-    if(usesMixins.toBoolean()) {
+    if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
+                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+        ]
+    }
+
+    if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
+        arguments += [
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
         ]
     }
 
@@ -320,19 +363,30 @@ runClient {
     }
 
     args(arguments)
+    jvmArgs(jvmArguments)
 }
 
 runServer {
     def arguments = []
+    def jvmArguments = []
 
     if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$modId-${version}.jar",
-                "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
+                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+        ]
+    }
+
+    if (usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
+        arguments += [
+                "--tweakClass", "org.spongepowered.asm.launch.MixinTweaker"
+        ]
+        jvmArguments += [
+                "-Dmixin.debug=true", "-Dmixin.debug.countInjections=true", "-Dmixin.debug.verbose=true", "-Dmixin.debug.export=true"
         ]
     }
 
     args(arguments)
+    jvmArgs(jvmArguments)
 }
 
 tasks.withType(JavaExec).configureEach {
@@ -344,31 +398,31 @@ tasks.withType(JavaExec).configureEach {
 }
 
 processResources
-        {
-            // this will ensure that this task is redone when the versions change.
-            inputs.property "version", project.version
-            inputs.property "mcversion", project.minecraft.version
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
-            // replace stuff in mcmod.info, nothing else
-            from(sourceSets.main.resources.srcDirs) {
-                include 'mcmod.info'
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
 
-                // replace version and mcversion
-                expand "minecraftVersion": project.minecraft.version,
-                        "modVersion": versionDetails().lastTag,
-                        "modId": modId,
-                        "modName": modName
-            }
+        // replace version and mcversion
+        expand "minecraftVersion": project.minecraft.version,
+                "modVersion": versionDetails().lastTag,
+                "modId": modId,
+                "modName": modName
+    }
 
-            if(usesMixins.toBoolean()) {
-                from refMap
-            }
+    if(usesMixins.toBoolean()) {
+        from refMap
+    }
 
-            // copy everything else, thats not the mcmod.info
-            from(sourceSets.main.resources.srcDirs) {
-                exclude 'mcmod.info'
-            }
-        }
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
 
 def getManifestAttributes() {
     def manifestAttributes = [:]
@@ -401,6 +455,12 @@ task sourcesJar(type: Jar) {
 }
 
 task shadowDevJar(type: ShadowJar) {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     from sourceSets.main.output
     getArchiveClassifier().set("dev")
 
@@ -409,7 +469,7 @@ task shadowDevJar(type: ShadowJar) {
     }
 
     minimize()  // This will only allow shading for actually used classes
-    configurations = [project.configurations.shadowImplementation]
+    configurations = [project.configurations.shadowImplementation, project.configurations.shadowCompile]
 }
 
 task relocateShadowDevJar(type: ConfigureShadowRelocation) {
@@ -424,6 +484,12 @@ task circularResolverJar(type: Jar) {
 }
 
 task devJar(type: Jar) {
+    project.configurations.shadeCompile.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+
     from sourceSets.main.output
     getArchiveClassifier().set("dev")
 
@@ -462,6 +528,29 @@ artifacts {
 }
 
 // publishing
+
+def getMavenSettingsCredentials = {
+    String userHome = System.getProperty( "user.home" );
+    File mavenSettings = new File(userHome, ".m2/settings.xml")
+    def xmlSlurper = new XmlSlurper()
+    def output = xmlSlurper.parse(mavenSettings)
+    return output."servers"."server"
+}
+
+def getCredentials = {
+    try {
+        def entries = getMavenSettingsCredentials()
+        for (entry in entries) {
+            if (entry."id".text() == repositoryName) {
+                return [username: entry.username.text(), password: entry.password.text()]
+            }
+        }
+    } catch (Exception ignored) {
+        return [username: "none", password: "none"]
+    }
+}
+
+//Publishing
 publishing {
     publications {
         maven(MavenPublication) {
@@ -472,22 +561,20 @@ publishing {
                 artifact source: apiJar, classifier: "api"
             }
 
-            groupId = System.getenv("ARTIFACT_GROUP_ID") ?: group
-            artifactId = System.getenv("ARTIFACT_ID") ?: project.name
-            version = System.getenv("ARTIFACT_VERSION") ?: project.version
+            groupId = mavenGroupId
+            artifactId = mavenArtifactId + "-mc" + minecraftVersion
+            version = gitVersion()
         }
     }
-    
+
     repositories {
         maven {
-            String owner = System.getenv("REPOSITORY_OWNER") ?: "Unknown"
-            String repositoryName = System.getenv("REPOSITORY_NAME") ?: "Unknown"
-            String githubRepositoryUrl = "https://maven.pkg.github.com/$owner/$repositoryName"
-            name = "GitHubPackages"
-            url = githubRepositoryUrl
+            name = repositoryName
+            url = repositoryURL
+            def creds = getCredentials()
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: "NONE"
-                password = System.getenv("GITHUB_TOKEN") ?: "NONE"
+                username = creds == null ? "none" : creds.username
+                password = creds == null ? "none" : creds.password
             }
         }
     }
@@ -502,7 +589,7 @@ task updateBuildScript {
     }
 }
 
-if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
+if (!skipBuildScriptUpdateCheck.toBoolean() && isNewBuildScriptVersionAvailable(projectDir.toString())) {
     if (autoUpdateBuildScript.toBoolean()) {
         performBuildScriptUpdate(projectDir.toString())
     } else {
@@ -511,7 +598,7 @@ if (isNewBuildScriptVersionAvailable(projectDir.toString())) {
 }
 
 static URL availableBuildScriptUrl() {
-    new URL("https://raw.githubusercontent.com/SinTh0r4s/ExampleMod1.7.10/main/build.gradle")
+    new URL("https://raw.githubusercontent.com/FalsePattern/ExampleMod1.7.10/main/build.gradle")
 }
 
 boolean performBuildScriptUpdate(String projectDir) {
@@ -553,7 +640,7 @@ configure(updateBuildScript) {
 
 def checkPropertyExists(String propertyName) {
     if (project.hasProperty(propertyName) == false) {
-        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/SinTh0r4s/ExampleMod1.7.10/blob/main/gradle.properties")
+        throw new GradleException("This project requires a property \"" + propertyName + "\"! Please add it your \"gradle.properties\". You can find all properties and their description here: https://github.com/FalsePattern/ExampleMod1.7.10/blob/main/gradle.properties")
     }
 }
 

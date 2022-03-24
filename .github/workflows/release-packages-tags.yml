@@ -1,4 +1,4 @@
-# This workflow only meant for the source mod you shouldn't bring it into your own project
+# This workflow is only meant for the source mod you shouldn't bring it into your own project
 
 name: Release starter and migration packages
 
@@ -29,17 +29,15 @@ jobs:
                 \
                 -x "*.git/*" \
                 \
-                -x ".github/scripts/update-version.sh" \
-                -x ".github/workflows/buildscript-maintenance.yml" \
                 -x ".github/workflows/release-packages-latest.yml" \
-                -x ".github/workflows/toolchain-compatibility.yml" \
+                -x ".github/workflows/release-packages-tags.yml" \
                 \
                 -x "*docs/*" \
                 -x "README.md" \
                 -x "LICENSE" \
                 \
-                -x "starter.zip" \
-                -x "migration.zip"
+                -x "packages/starter.zip" \
+                -x "packages/migration.zip"
 
       - name: Zip migration
         uses: montudor/action-zip@v1
@@ -49,19 +47,16 @@ jobs:
                 \
                 -x "*.git/*" \
                 \
-                -x ".github/scripts/update-version.sh" \
-                -x ".github/workflows/buildscript-maintenance.yml" \
                 -x ".github/workflows/release-packages-latest.yml" \
                 -x ".github/workflows/release-packages-tags.yml" \
-                -x ".github/workflows/toolchain-compatibility.yml" \
                 \
                 -x "*docs/*" \
                 -x "*src/*" \
                 -x "LICENSE" \
                 -x "README.md" \
                 \
-                -x "starter.zip" \
-                -x "migration.zip"
+                -x "packages/starter.zip" \
+                -x "packages/migration.zip"
 
       - name: Release under current tag
         uses: "marvinpinto/action-automatic-releases@latest"

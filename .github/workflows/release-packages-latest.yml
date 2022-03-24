@@ -1,5 +1,4 @@
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+# This workflow is only meant for the source mod you shouldn't bring it into your own project
 
 name: Release latest starter and migration packages
 
@@ -29,8 +28,6 @@ jobs:
                 \
                 -x "*.git/*" \
                 \
-                -x ".github/scripts/update-version.sh" \
-                -x ".github/workflows/buildscript-maintenance.yml" \
                 -x ".github/workflows/release-packages-latest.yml" \
                 -x ".github/workflows/release-packages-tags.yml" \
                 \
@@ -38,8 +35,8 @@ jobs:
                 -x "README.md" \
                 -x "LICENSE" \
                 \
-                -x "starter.zip" \
-                -x "migration.zip"
+                -x "packages/starter.zip" \
+                -x "packages/migration.zip"
 
       - name: Zip migration
         uses: montudor/action-zip@v1
@@ -49,8 +46,6 @@ jobs:
                 \
                 -x "*.git/*" \
                 \
-                -x ".github/scripts/update-version.sh" \
-                -x ".github/workflows/buildscript-maintenance.yml" \
                 -x ".github/workflows/release-packages-latest.yml" \
                 -x ".github/workflows/release-packages-tags.yml" \
                 \
@@ -59,8 +54,8 @@ jobs:
                 -x "LICENSE" \
                 -x "README.md" \
                 \
-                -x "starter.zip" \
-                -x "migration.zip"
+                -x "packages/starter.zip" \
+                -x "packages/migration.zip"
 
       - name: Update latest tag
         uses: "marvinpinto/action-automatic-releases@latest"
