@@ -1,4 +1,4 @@
-//version: 1641429628falsepattern13
+//version: 1641429628falsepattern14
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -545,8 +545,15 @@ def getCredentials = {
                 return [username: entry.username.text(), password: entry.password.text()]
             }
         }
+        throw new Exception();
     } catch (Exception ignored) {
-        return [username: "none", password: "none"]
+        //Try from environment variables if file does not exist
+        String username = System.getenv("MAVEN_DEPLOY_USER")
+        String password = System.getenv("MAVEN_DEPLOY_PASSWORD")
+        if (username == null || password == null) {
+            throw new GradleException("Could not retrieve deployment authentication information neither from ~/.m2/settings.xml, nor from the environment variables!")
+        }
+        return [username: username, password: password]
     }
 }
 
@@ -568,13 +575,15 @@ publishing {
     }
 
     repositories {
-        maven {
-            name = repositoryName
-            url = repositoryURL
-            def creds = getCredentials()
-            credentials {
-                username = creds == null ? "none" : creds.username
-                password = creds == null ? "none" : creds.password
+        if (repositoryURL.trim() != "") {
+            maven {
+                name = repositoryName
+                url = repositoryURL
+                def creds = getCredentials()
+                credentials {
+                    username = creds == null ? "none" : creds.username
+                    password = creds == null ? "none" : creds.password
+                }
             }
         }
     }
