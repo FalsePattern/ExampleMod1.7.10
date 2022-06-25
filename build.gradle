@@ -1,4 +1,4 @@
-//version: 1641429628falsepattern19
+//version: 1641429628falsepattern20
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -38,7 +38,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.6'
-        classpath 'com.falsepattern:jtweaker:0.1.0'
+        classpath 'com.falsepattern:jtweaker:0.2.0'
     }
 }
 
