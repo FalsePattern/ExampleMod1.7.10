@@ -1,4 +1,4 @@
-//version: 1641429628falsepattern21
+//version: 1641429628falsepattern22
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -238,9 +238,9 @@ dependencies {
         annotationProcessor("org.ow2.asm:asm-debug-all:5.0.3")
         annotationProcessor("com.google.guava:guava:24.1.1-jre")
         annotationProcessor("com.google.code.gson:gson:2.8.6")
-        annotationProcessor("org.spongepowered:mixin:0.8-SNAPSHOT")
+        annotationProcessor("org.spongepowered:mixin:0.8-20200110.181151-15")
         // using 0.8 to workaround a issue in 0.7 which fails mixin application
-        compile("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        compile("org.spongepowered:mixin:0.7.11-20180703.121122-1") {
             // Mixin includes a lot of dependencies that are too up-to-date
             exclude module: "launchwrapper"
             exclude module: "guava"
@@ -251,7 +251,7 @@ dependencies {
         compile("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
     }
     if(hasMixinDeps.toBoolean()) {
-        runtime("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        runtime("org.spongepowered:mixin:0.7.11-20180703.121122-1") {
             // Mixin includes a lot of dependencies that are too up-to-date
             exclude module: "launchwrapper"
             exclude module: "guava"
