@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern26
+//version: 1656003793falsepattern27
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -675,8 +675,8 @@ publishing {
                 url = repositoryURL
                 def creds = getCredentials()
                 credentials {
-                    username = creds == null ? "none" : creds.username
-                    password = creds == null ? "none" : creds.password
+                    username = creds?.username ?: "none"
+                    password = creds?.password ?: "none"
                 }
             }
         }
