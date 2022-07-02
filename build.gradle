@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern28
+//version: 1656003793falsepattern29
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -840,16 +840,19 @@ configure(deobfParams) {
 // Dependency Deobfuscation
 
 def deobfMaven(mavenDep) {
+    throw new GradleException("deobfMaven(mavenDep) is deprecated. " +
+            "You must use the new deobfMaven(repoURL, mavenDep) method instead." +
+            "The old method broke the buildscript when used.")
+}
+
+def deobfMaven(String repoURL, String mavenDep) {
+    if (!repoURL.endsWith("/")) {
+        repoURL += "/"
+    }
     String[] parts = mavenDep.split(":")
     parts[0] = parts[0].replace('.', '/')
-    for (ArtifactRepository repository: project.repositories.asList()) {
-        def url = repository.properties.get("url").toString()
-        def jarURL = url + parts[0] + "/" + parts[1] + "/" + parts[2] + "/" + parts[1] + "-" + parts[2] + ".jar"
-        try {
-            return deobf(jarURL)
-        } catch (Exception ignored){}
-    }
-    throw new GradleException("Could not find dependency " + mavenDep + " on any repository!")
+    def jarURL = repoURL + parts[0] + "/" + parts[1] + "/" + parts[2] + "/" + parts[1] + "-" + parts[2] + ".jar"
+    return deobf(jarURL)
 }
 
 def deobf(String sourceURL) {
