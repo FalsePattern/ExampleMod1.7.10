@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern30
+//version: 1656003793falsepattern31
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -277,13 +277,15 @@ repositories {
         name = "Overmind forge repo mirror"
         url = "https://gregtech.overminddl1.com/"
     }
-    if((usesMixins.toBoolean() && useObsoleteSpongeMixins.toBoolean()) || hasMixinDeps.toBoolean()) {
-        maven {
-            name = "sponge"
-            url = "https://sponge.falsepattern.com/"
+    if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
+        if (useObsoleteSpongeMixins.toBoolean()) {
+            maven {
+                name = "sponge"
+                url = "https://mvn.falsepattern.com/sponge"
+            }
         }
         maven {
-            url = "https://jitpack.falsepattern.com/"
+            url = "https://mvn.falsepattern.com/jitpack"
         }
     }
 }
