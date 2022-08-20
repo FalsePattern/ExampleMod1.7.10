@@ -6,6 +6,8 @@ import com.falsepattern.lib.mixin.ITargetedMod;
 import com.myname.mymodid.Tags;
 import lombok.Getter;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.libraries.org.objectweb.asm.tree.ClassNode;
 
 public class MixinPlugin implements IMixinPlugin {
     @Getter
@@ -19,5 +21,15 @@ public class MixinPlugin implements IMixinPlugin {
     @Override
     public IMixin[] getMixinEnumValues() {
         return Mixin.values();
+    }
+
+    @Override
+    public void preApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
+
+    }
+
+    @Override
+    public void postApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
+
     }
 }
