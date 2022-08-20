@@ -24,7 +24,7 @@ buildscript {
         mavenLocal()
         maven {
             name = "forge"
-            url = "https://maven.minecraftforge.net"
+            url = "https://mvn.falsepattern.com/forge"
         }
         maven {
             name = "sonatype"
@@ -36,11 +36,11 @@ buildscript {
         }
         maven {
             name = "jitpack"
-            url = "https://jitpack.falsepattern.com/"
+            url = "https://mvn.falsepattern.com/jitpack/"
         }
         maven {
             name = "mavenpattern"
-            url = "https://maven.falsepattern.com/"
+            url = "https://mvn.falsepattern.com/releases/"
         }
     }
     dependencies {
@@ -694,7 +694,7 @@ task updateBuildScript {
     }
 }
 
-if (!skipBuildScriptUpdateCheck.toBoolean() && isNewBuildScriptVersionAvailable(projectDir.toString())) {
+if (!project.getGradle().startParameter.isOffline() && !skipBuildScriptUpdateCheck.toBoolean() && isNewBuildScriptVersionAvailable(projectDir.toString())) {
     if (autoUpdateBuildScript.toBoolean()) {
         performBuildScriptUpdate(projectDir.toString())
     } else {
