@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern33
+//version: 1656003793falsepattern34
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -395,23 +395,19 @@ jar {
 }
 
 reobf {
-    if(usesMixins.toBoolean() && file(mixinSrg).exists()) {
+    if(usesMixins.toBoolean()) {
         addExtraSrgFile mixinSrg
     }
 }
 
-afterEvaluate {
-    if(usesMixins.toBoolean()) {
-        tasks.compileJava {
-            options.compilerArgs += [
-                    "-AreobfSrgFile=${srgFile}",
-                    "-AoutSrgFile=${mixinSrg}",
-                    "-AoutRefMapFile=${mixinRefMap}",
-                    // Elan: from what I understand they are just some linter configs so you get some warning on how to properly code
-                    "-XDenableSunApiLintControl",
-                    "-XDignore.symbol.file"
-            ]
-        }
+if(usesMixins.toBoolean()) {
+    tasks.compileJava {
+        options.compilerArgs += [
+                '-Xlint:-processing',
+                "-AreobfSrgFile=${srgFile}",
+                "-AoutSrgFile=${mixinSrg}",
+                "-AoutRefMapFile=${mixinRefMap}"
+        ]
     }
 }
 
