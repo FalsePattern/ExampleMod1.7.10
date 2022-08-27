@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern35
+//version: 1656003793falsepattern36
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -653,10 +653,10 @@ def getCredentials = {
 }
 
 //Publishing
+publish.dependsOn(build)
 publishing {
     publications {
         maven(MavenPublication) {
-            from components.java
             artifact source: usesShadowedDependencies.toBoolean() ? shadowJar : jar, classifier: ""
             artifact source: sourcesJar, classifier: "sources"
             artifact source: usesShadowedDependencies.toBoolean() ? shadowDevJar : devJar, classifier: "dev"
@@ -666,7 +666,7 @@ publishing {
 
             groupId = mavenGroupId
             artifactId = mavenArtifactId + "-mc" + minecraftVersion
-            version = gitVersion()
+            version = modVersion
 
             // remove extra garbage from minecraft and minecraftDeps configuration
             pom.withXml {
