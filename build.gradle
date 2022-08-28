@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern37
+//version: 1656003793falsepattern38
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -132,7 +132,7 @@ propertyDefaultIfUnset("modrinthProjectId", "")
 propertyDefaultIfUnset("modrinthDependencies", "")
 propertyDefaultIfUnset("curseForgeProjectId", "")
 propertyDefaultIfUnset("curseForgeRelations", "")
-propertyDefaultIfUnset("changelogUrl", "No changelog URL was provided.")
+propertyDefaultIfUnset("changelog", "No changelog URL was provided.")
 
 propertyDefaultIfUnset("remoteMappings", "https://raw.githubusercontent.com/MinecraftForge/FML/1.7.10/conf/")
 propertyDefaultIfUnset("mappingsChannel", "stable")
@@ -724,7 +724,7 @@ if (curseForgeProjectId != "") {
         project {
             id = curseForgeProjectId
             changelogType = "text"
-            changelog = changelogUrl.replace("{version}", modVersion)
+            changelog = project.changelog.replace("{version}", modVersion)
             releaseType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
             addGameVersion project.minecraft.version
             mainArtifact(jar) {
@@ -759,7 +759,7 @@ if (modrinthProjectId != "") {
         projectId = modrinthProjectId
         versionNumber = modVersion
         versionType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
-        changelog = changelogUrl.replace("{version}", modVersion)
+        changelog = project.changelog.replace("{version}", modVersion)
         uploadFile = jar
         gameVersions = [project.minecraft.version]
         loaders = ["forge"]
