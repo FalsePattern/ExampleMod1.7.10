@@ -4,15 +4,11 @@
 
 An example mod for Minecraft 1.7.10 with Forge focused on a stable, updatable setup.
 
-# NOTICE
-### This fork will not diverge from upstream. The only changes are:
-
-- Removed jitpack
-- Removed GitHub package publishing, only support tagged releases now.
-- Added proper maven repo publishing
-- Modified version string. Instead of 1.7.10-version, it's version-mc1.7.10, for SemVer compatibility.
-
-If upstream receives any update, this repo will also update to include said changes.
+### Notice about gradle.properties
+The gradle.properties file has been optimized for IntelliJ IDEA or other IDEs that support region/endregion
+comment-based code folding.<br>
+Use the "fold all" hotkey of your IDE (CTRL+Shift+Minus in IDEA) while the gradle.properties
+is open to collapse it to an easily traversable form.
 
 ### Motivation
 
