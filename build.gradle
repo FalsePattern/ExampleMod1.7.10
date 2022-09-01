@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern37
+//version: 1656003793falsepattern41
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -126,13 +126,12 @@ propertyDefaultIfUnset("mavenArtifactId", "")
 propertyDefaultIfUnset("hasMixinDeps", false)
 propertyDefaultIfUnset("mixinPreinitConfig", "")
 propertyDefaultIfUnset("remapStubs", false)
-propertyDefaultIfUnset("useObsoleteSpongeMixins", false)
 
 propertyDefaultIfUnset("modrinthProjectId", "")
 propertyDefaultIfUnset("modrinthDependencies", "")
 propertyDefaultIfUnset("curseForgeProjectId", "")
 propertyDefaultIfUnset("curseForgeRelations", "")
-propertyDefaultIfUnset("changelogUrl", "No changelog URL was provided.")
+propertyDefaultIfUnset("changelog", "No changelog URL was provided.")
 
 propertyDefaultIfUnset("remoteMappings", "https://raw.githubusercontent.com/MinecraftForge/FML/1.7.10/conf/")
 propertyDefaultIfUnset("mappingsChannel", "stable")
@@ -284,54 +283,29 @@ repositories {
         url = "https://gregtech.overminddl1.com/"
     }
     if(usesMixins.toBoolean() || hasMixinDeps.toBoolean()) {
-        if (useObsoleteSpongeMixins.toBoolean()) {
-            maven {
-                name = "sponge"
-                url = "https://mvn.falsepattern.com/sponge"
-            }
+        maven {
+            name = "sponge"
+            url = "https://mvn.falsepattern.com/releases"
         }
         maven {
-            url = "https://mvn.falsepattern.com/jitpack"
+            name = "sponge2"
+            url = "https://mvn.falsepattern.com/sponge"
         }
     }
 }
 
 dependencies {
     if(usesMixins.toBoolean()) {
-        if (useObsoleteSpongeMixins.toBoolean()) {
-            annotationProcessor("org.ow2.asm:asm-debug-all:5.0.3")
-            annotationProcessor("com.google.guava:guava:24.1.1-jre")
-            annotationProcessor("com.google.code.gson:gson:2.8.6")
-            annotationProcessor("org.spongepowered:mixin:0.8-20200110.181151-15")
-            // using 0.8 to workaround a issue in 0.7 which fails mixin application
-            compile("org.spongepowered:mixin:0.7.11-20180703.121122-1") {
-                // Mixin includes a lot of dependencies that are too up-to-date
-                exclude module: "launchwrapper"
-                exclude module: "guava"
-                exclude module: "gson"
-                exclude module: "commons-io"
-                exclude module: "log4j-core"
-            }
-            compile("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
-        } else {
-            compile("com.github.tox1cozZ:mixin-booter-legacy:1.1.2")
-            annotationProcessor("com.github.tox1cozZ:mixin-booter-legacy:1.1.2:processor")
-        }
-    }
-    if(hasMixinDeps.toBoolean()) {
-        if (useObsoleteSpongeMixins.toBoolean()) {
-            runtime("org.spongepowered:mixin:0.7.11-20180703.121122-1") {
-                // Mixin includes a lot of dependencies that are too up-to-date
-                exclude module: "launchwrapper"
-                exclude module: "guava"
-                exclude module: "gson"
-                exclude module: "commons-io"
-                exclude module: "log4j-core"
-            }
-            runtime("com.github.GTNewHorizons:SpongeMixins:1.3.3:dev")
-        } else {
-            runtime("com.github.tox1cozZ:mixin-booter-legacy:1.1.2")
-        }
+        annotationProcessor("org.ow2.asm:asm-debug-all:5.0.3")
+        annotationProcessor("com.google.guava:guava:24.1.1-jre")
+        annotationProcessor("com.google.code.gson:gson:2.8.6")
+        annotationProcessor("org.spongepowered:mixin:0.8.3-gasstation")
+        compile("org.spongepowered:mixin:0.8.3-gasstation")
+        compile("com.falsepattern:gasstation-mc1.7.10:7370815:dev")
+    } else if(hasMixinDeps.toBoolean()) {
+        runtime("org.spongepowered:mixin:0.8.3-gasstation")
+        runtime("com.llamalad7:MixinExtras:0.0.12-gasstation")
+        runtime("com.falsepattern:gasstation-mc1.7.10:7370815:dev")
     }
 }
 
@@ -724,9 +698,10 @@ if (curseForgeProjectId != "") {
         project {
             id = curseForgeProjectId
             changelogType = "text"
-            changelog = changelogUrl.replace("{version}", modVersion)
+            changelog = project.changelog.replace("{version}", modVersion)
             releaseType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
             addGameVersion project.minecraft.version
+            addGameVersion "Forge"
             mainArtifact(jar) {
                 displayName = "$modName version: $modVersion"
             }
@@ -749,7 +724,7 @@ if (curseForgeProjectId != "") {
         }
     }
     tasks.curseforge.dependsOn(build)
-    tasks.publish.dependsOn(curseforge)
+    tasks.publish.dependsOn(tasks.curseforge)
 }
 
 if (modrinthProjectId != "") {
@@ -759,7 +734,7 @@ if (modrinthProjectId != "") {
         projectId = modrinthProjectId
         versionNumber = modVersion
         versionType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
-        changelog = changelogUrl.replace("{version}", modVersion)
+        changelog = project.changelog.replace("{version}", modVersion)
         uploadFile = jar
         gameVersions = [project.minecraft.version]
         loaders = ["forge"]
@@ -779,7 +754,7 @@ if (modrinthProjectId != "") {
         }
     }
     tasks.modrinth.dependsOn(build)
-    tasks.publish.dependsOn(modrinth)
+    tasks.publish.dependsOn(tasks.modrinth)
 }
 
 def addModrinthDep(scope, type, name) {
