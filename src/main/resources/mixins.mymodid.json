@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "minVersion": "0.8.3",
+  "package": "com.myname.mymodid.mixin.mixins",
+  "plugin": "com.myname.mymodid.mixin.plugin.MixinPlugin",
+  "refmap": "mixins.mymodid.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8"
+}
+
