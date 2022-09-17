@@ -10,5 +10,5 @@ dependencies {
         transitive = false
     }
 
-    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.3:dev")
+    compile("com.falsepattern:falsepatternlib-mc1.7.10:0.10.10:dev")
 }
