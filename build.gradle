@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern52
+//version: 1656003793falsepattern53
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -133,7 +133,7 @@ propertyDefaultIfUnset("modrinthProjectId", "")
 propertyDefaultIfUnset("modrinthDependencies", "")
 propertyDefaultIfUnset("curseForgeProjectId", "")
 propertyDefaultIfUnset("curseForgeRelations", "")
-propertyDefaultIfUnset("changelog", "No changelog URL was provided.")
+propertyDefaultIfUnset("changelog", "")
 
 propertyDefaultIfUnset("remoteMappings", "https://raw.githubusercontent.com/MinecraftForge/FML/1.7.10/conf/")
 propertyDefaultIfUnset("mappingsChannel", "stable")
@@ -703,15 +703,24 @@ publishing {
     }
 }
 
+if (project.changelog == "") {
+    File changelogFile = new File(System.getenv("CHANGELOG_FILE") ?: "CHANGELOG.md")
+    if (changelogFile.exists()) {
+        project.changelog = changelogFile.getText("UTF-8")
+    } else {
+        project.changelog = "No changelog was provided."
+    }
+}
+project.changelog = project.changelog.replace("{version}", modVersion)
 
-if (curseForgeProjectId != "") {
+if (curseForgeProjectId != "" && System.getenv("CURSEFORGE_TOKEN") != null) {
     apply plugin: 'com.matthewprenger.cursegradle'
     curseforge {
-        apiKey = System.getenv("CURSEFORGE_TOKEN") ?: ""
+        apiKey = System.getenv("CURSEFORGE_TOKEN")
         project {
             id = curseForgeProjectId
-            changelogType = "text"
-            changelog = project.changelog.replace("{version}", modVersion)
+            changelogType = "markdown"
+            changelog = project.changelog
             releaseType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
             addGameVersion project.minecraft.version
             addGameVersion "Forge"
@@ -744,14 +753,14 @@ if (curseForgeProjectId != "") {
     tasks.publish.dependsOn(tasks.curseforge)
 }
 
-if (modrinthProjectId != "") {
+if (modrinthProjectId != "" && System.getenv("MODRINTH_TOKEN") != null) {
     apply plugin: 'com.modrinth.minotaur'
     modrinth {
         token = System.getenv("MODRINTH_TOKEN")
         projectId = modrinthProjectId
         versionNumber = modVersion
         versionType = modVersion.contains("-a") ? "alpha" : modVersion.contains("-b") ? "beta" : "release"
-        changelog = project.changelog.replace("{version}", modVersion)
+        changelog = project.changelog
         uploadFile = jar
         gameVersions = [project.minecraft.version]
         loaders = ["forge"]
