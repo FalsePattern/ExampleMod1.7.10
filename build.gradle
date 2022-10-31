@@ -303,15 +303,15 @@ dependencies {
         annotationProcessor("org.ow2.asm:asm-debug-all:5.0.3")
         annotationProcessor("com.google.guava:guava:24.1.1-jre")
         annotationProcessor("com.google.code.gson:gson:2.8.6")
-        annotationProcessor("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        annotationProcessor("org.spongepowered:mixin:0.8.5-gasstation_4")
-        compile("org.spongepowered:mixin:0.8.5-gasstation_4")
-        compile("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        compile("com.falsepattern:00gasstation-mc1.7.10:0.3.5:dev")
+        annotationProcessor("com.llamalad7:MixinExtras:0.1.0-gasstation")
+        annotationProcessor("org.spongepowered:mixin:0.8.5-gasstation_5")
+        compile("org.spongepowered:mixin:0.8.5-gasstation_5")
+        compile("com.llamalad7:MixinExtras:0.1.0-gasstation")
+        compile("com.falsepattern:00gasstation-mc1.7.10:0.4.0:dev")
     } else if(hasMixinDeps.toBoolean()) {
-        runtime("org.spongepowered:mixin:0.8.5-gasstation_4")
-        runtime("com.llamalad7:MixinExtras:0.0.12-gasstation")
-        runtime("com.falsepattern:00gasstation-mc1.7.10:0.3.5:dev")
+        runtime("com.llamalad7:MixinExtras:0.1.0-gasstation")
+        runtime("org.spongepowered:mixin:0.8.5-gasstation_5")
+        runtime("com.falsepattern:00gasstation-mc1.7.10:0.4.0:dev")
     }
 }
 
@@ -736,6 +736,10 @@ if (curseForgeProjectId != "") {
             addCurseForgeRelation(type, name)
         }
     }
+
+    if (usesMixins.toBoolean()) {
+        addCurseForgeRelation("requiredDependency", "gasstation")
+    }
     tasks.curseforge.dependsOn(build)
     tasks.publish.dependsOn(tasks.curseforge)
 }
@@ -765,6 +769,9 @@ if (modrinthProjectId != "") {
             String name = parts[1]
             addModrinthDep(scope, type, name)
         }
+    }
+    if (usesMixins.toBoolean()) {
+        addModrinthDep("required", "project", "cdeAhgfp")
     }
     tasks.modrinth.dependsOn(build)
     tasks.publish.dependsOn(tasks.modrinth)
