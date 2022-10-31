@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern53
+//version: 1656003793falsepattern54
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -1114,4 +1114,8 @@ def propertyDefaultIfUnset(String propertyName, defaultValue) {
 
 def getFile(String relativePath) {
     return new File(projectDir, relativePath)
+}
+
+if(file("addon_final.gradle").exists()) {
+    apply from: "addon_final.gradle"
 }
