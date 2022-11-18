@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern54
+//version: 1656003793falsepattern55
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -46,9 +46,13 @@ buildscript {
             name = "mavenpattern"
             url = "https://mvn.falsepattern.com/releases/"
         }
+        maven {
+            name = "usrv"
+            url = "https://mvn.falsepattern.com/usrv/"
+        }
     }
     dependencies {
-        classpath 'com.github.GTNewHorizons:ForgeGradle:1.2.7'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.11'
         classpath 'com.falsepattern:jtweaker:0.2.1'
     }
 }
