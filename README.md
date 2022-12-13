@@ -101,6 +101,9 @@ If your project requires custom gradle commands you may add a `addon.gradle` to 
 automatically to the build script. Although we recommend against it, it is sometimes required. When in doubt,
 feel free to ask us about it. You may break future updates of this build system!
 
+Additionally, this fork of the buildscript also supports an `addon_final.gradle` addon, which gets loaded at the very
+end of the entire buildscript.
+
 ### Feedback wanted
 
 If you tried out this build script we would love to head your opinion! Is there any feature missing for you? Did
