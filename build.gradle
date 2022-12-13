@@ -413,7 +413,7 @@ runClient {
 
     if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+                "--mods=" + Paths.get("$projectDir").resolve(minecraft.runDir).normalize().relativize(Paths.get("$projectDir/build/libs/$archivesBaseName-${version}.jar"))
         ]
     }
 
@@ -443,7 +443,7 @@ runServer {
 
     if (usesMixins.toBoolean()) {
         arguments += [
-                "--mods=../build/libs/$archivesBaseName-${version}.jar"
+                "--mods=" + Paths.get("$projectDir").resolve(minecraft.runDir).normalize().relativize(Paths.get("$projectDir/build/libs/$archivesBaseName-${version}.jar"))
         ]
     }
 
