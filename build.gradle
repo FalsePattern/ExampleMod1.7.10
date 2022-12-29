@@ -257,7 +257,9 @@ minecraft {
     runDir = "run"
 
     if (replaceGradleTokenInFile) {
-        replaceIn replaceGradleTokenInFile
+        for (file in replaceGradleTokenInFile.split(',')) {
+            replaceIn file
+        }
         if(gradleTokenModId) {
             replace gradleTokenModId, modId
         }
