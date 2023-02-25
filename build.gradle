@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern62
+//version: 1656003793falsepattern63
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -1081,7 +1081,7 @@ def deobf(String sourceURL, String rawFileName) {
     }
 
     exec {
-        commandLine 'java', '-jar', bon2File, '--inputJar', obfFile, '--outputJar', deobfFile, '--mcVer', minecraftVersion, '--mappingsVer', mappingsVer, '--notch'
+        commandLine Paths.get(System.getProperty("java.home"), "bin", "java").toAbsolutePath().toString(), '-jar', bon2File, '--inputJar', obfFile, '--outputJar', deobfFile, '--mcVer', minecraftVersion, '--mappingsVer', mappingsVer, '--notch'
         workingDir bon2Dir
         standardOutput = new FileOutputStream("${deobfFile}.log")
     }
