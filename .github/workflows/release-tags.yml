@@ -32,6 +32,9 @@ jobs:
       - name: Setup the workspace
         run: ./gradlew setupCIWorkspace
 
+      - name: Assemble the artifacts
+        run: ./gradlew assemble
+
       - name: Publish to Maven, Modrinth, and CurseForge
         run: ./gradlew publish
         env:
