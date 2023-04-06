@@ -1,6 +1,6 @@
 # Example Forge Mod for Minecraft 1.7.10
 
-[![](https://github.com/FalsePattern/ExampleMod1.7.10/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/FalsePattern/ExampleMod1.7.10/actions/workflows/build-and-test.yml)
+[![](https://github.com/FalsePattern/ExampleMod1.7.10/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/FalsePattern/ExampleMod1.7.10/actions/workflows/build-and-test.yml)f
 
 An example mod for Minecraft 1.7.10 with Forge focused on a stable, updatable setup.
 
