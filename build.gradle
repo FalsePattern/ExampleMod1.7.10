@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern67
+//version: 1656003793falsepattern68
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -281,6 +281,10 @@ if(file("addon.gradle").exists()) {
 
 apply from: 'repositories.gradle'
 
+if(file('repositories_override.gradle').exists()) {
+    apply from: 'repositories_override.gradle'
+}
+
 configurations {
     for (config in [shadowImplementation, shadowCompile, shadeCompile]) {
         implementation.extendsFrom(shadeCompile)
@@ -334,6 +338,10 @@ dependencies {
 }
 
 apply from: 'dependencies.gradle'
+
+if(file('dependencies_override.gradle').exists()) {
+    apply from: 'dependencies_override.gradle'
+}
 
 def mixinDir = new File(project.buildDir, 'mixins')
 if (!mixinDir.exists()) {
