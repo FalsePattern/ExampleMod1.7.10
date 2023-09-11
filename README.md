@@ -1,3 +1,6 @@
+# DO NOT USE "DOWNLOAD AS ZIP" ON THIS REPO
+If you want to use this examplemod as a project starter, see the [Getting Started](#getting-started) section.
+
 # Example Forge Mod for Minecraft 1.7.10
 
 [![](https://github.com/FalsePattern/ExampleMod1.7.10/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/FalsePattern/ExampleMod1.7.10/actions/workflows/build-and-test.yml)
