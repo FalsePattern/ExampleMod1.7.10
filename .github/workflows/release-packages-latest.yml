@@ -36,7 +36,9 @@ jobs:
                 -x "LICENSE" \
                 \
                 -x "packages/starter.zip" \
-                -x "packages/migration.zip"
+                -x "packages/migration.zip" \
+                -x "packages" \
+                -x "blobs/*"
 
       - name: Zip migration
         uses: montudor/action-zip@v1
@@ -55,7 +57,9 @@ jobs:
                 -x "README.md" \
                 \
                 -x "packages/starter.zip" \
-                -x "packages/migration.zip"
+                -x "packages/migration.zip" \
+                -x "packages" \
+                -x "blobs/*"
 
       - name: Update latest tag
         uses: "marvinpinto/action-automatic-releases@latest"

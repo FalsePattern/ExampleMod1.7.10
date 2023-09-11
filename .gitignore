@@ -224,3 +224,6 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,gradle,forgegradle,java,eclipse,netbeans
 !blobs/
+
+dependencies_override.gradle
+repositories_override.gradle
