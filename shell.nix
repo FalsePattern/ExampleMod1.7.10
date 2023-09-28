@@ -26,6 +26,9 @@ let
       libXcursor
       libXrandr
       libXxf86vm
+      libXrender
+      libXi
+      libXtst
     ])
     ++ [
       # lwjgl
