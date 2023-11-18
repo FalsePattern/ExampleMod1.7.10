@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern68
+//version: 1656003793falsepattern69
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -132,6 +132,7 @@ propertyDefaultIfUnset("mixinConfigs", "")
 propertyDefaultIfUnset("mixinPluginPreInit", "")
 propertyDefaultIfUnset("mixinPluginMinimumVersion", "0.8.5")
 propertyDefaultIfUnset("remapStubs", false)
+propertyDefaultIfUnset("apiPackages", null)
 
 propertyDefaultIfUnset("modrinthProjectId", "")
 propertyDefaultIfUnset("modrinthDependencies", "")
@@ -143,24 +144,28 @@ propertyDefaultIfUnset("remoteMappings", "https://raw.githubusercontent.com/Mine
 propertyDefaultIfUnset("mappingsChannel", "stable")
 propertyDefaultIfUnset("mappingsVersion", "12")
 
-String javaSourceDir = "src/main/java/"
-String scalaSourceDir = "src/main/scala/"
-String kotlinSourceDir = "src/main/kotlin/"
 
-String targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/")
-String targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/")
-String targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/")
-if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
-    throw new GradleException("Could not resolve \"modGroup\"! Could not find " + targetPackageJava + " or " + targetPackageScala + " or " + targetPackageKotlin)
+def verifyPackage(thePackage, propName) {
+    String javaSourceDir = "src/main/java/"
+    String scalaSourceDir = "src/main/scala/"
+    String kotlinSourceDir = "src/main/kotlin/"
+    String targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + thePackage.toString().replaceAll("\\.", "/")
+    String targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + thePackage.toString().replaceAll("\\.", "/")
+    String targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + thePackage.toString().replaceAll("\\.", "/")
+    if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
+        throw new GradleException("Could not resolve \"${propName}\"! Could not find " + targetPackageJava + " or " + targetPackageScala + " or " + targetPackageKotlin)
+    }
 }
 
+verifyPackage("", "modGroup")
+
 if(apiPackage) {
-    targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/")
-    targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/")
-    targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/")
-    if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
-        throw new GradleException("Could not resolve \"apiPackage\"! Could not find " + targetPackageJava + " or " + targetPackageScala + " or " + targetPackageKotlin)
-    }
+    verifyPackage(apiPackage, "apiPackage")
+}
+
+
+if (apiPackages) {
+    apiPackages.tokenize(';').forEach { it -> verifyPackage(it, "apiPackages")}
 }
 
 if(accessTransformersFile) {
@@ -610,11 +615,21 @@ task devJar(type: Jar) {
 
 task apiJar(type: Jar) {
     from (sourceSets.main.allSource) {
-        include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackage)
+            include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackages)
+            apiPackages.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/**'
+            }
     }
 
     from (sourceSets.main.output) {
-        include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackage)
+            include modGroup.toString().replaceAll("\\.", "/") + "/" + apiPackage.toString().replaceAll("\\.", "/") + '/**'
+        if (apiPackages)
+            apiPackages.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/**'
+            }
     }
 
     from (sourceSets.main.resources.srcDirs) {
@@ -635,7 +650,7 @@ compileJava.dependsOn(copySrgs)
 artifacts {
     archives sourcesJar
     archives devJar
-    if(apiPackage) {
+    if(apiPackage || apiPackages) {
         archives apiJar
     }
 }
@@ -691,7 +706,7 @@ publishing {
                 artifact source: sourcesJar, classifier: "sources"
             }
             artifact source: usesShadowedDependencies.toBoolean() ? shadowDevJar : devJar, classifier: "dev"
-            if (apiPackage) {
+            if (apiPackage || apiPackages) {
                 artifact source: apiJar, classifier: "api"
             }
 
