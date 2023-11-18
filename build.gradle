@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern69
+//version: 1656003793falsepattern70
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -133,6 +133,7 @@ propertyDefaultIfUnset("mixinPluginPreInit", "")
 propertyDefaultIfUnset("mixinPluginMinimumVersion", "0.8.5")
 propertyDefaultIfUnset("remapStubs", false)
 propertyDefaultIfUnset("apiPackages", null)
+propertyDefaultIfUnset("apiPackagesNoRecurse", null)
 
 propertyDefaultIfUnset("modrinthProjectId", "")
 propertyDefaultIfUnset("modrinthDependencies", "")
@@ -144,6 +145,9 @@ propertyDefaultIfUnset("remoteMappings", "https://raw.githubusercontent.com/Mine
 propertyDefaultIfUnset("mappingsChannel", "stable")
 propertyDefaultIfUnset("mappingsVersion", "12")
 
+String javaSourceDir = "src/main/java/"
+String scalaSourceDir = "src/main/scala/"
+String kotlinSourceDir = "src/main/kotlin/"
 
 def verifyPackage(thePackage, propName) {
     String javaSourceDir = "src/main/java/"
@@ -168,6 +172,10 @@ if (apiPackages) {
     apiPackages.tokenize(';').forEach { it -> verifyPackage(it, "apiPackages")}
 }
 
+if (apiPackagesNoRecurse) {
+    apiPackagesNoRecurse.tokenize(';').forEach { it -> verifyPackage(it, "apiPackagesNoRecurse")}
+}
+
 if(accessTransformersFile) {
     String targetFile = "src/main/resources/META-INF/" + accessTransformersFile
     if(!getFile(targetFile).exists()) {
@@ -180,9 +188,9 @@ if(usesMixins.toBoolean()) {
         throw new GradleException("\"usesMixins\" requires \"mixinsPackage\" to be set!")
     }
 
-    targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
-    targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
-    targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
+    String targetPackageJava = javaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
+    String targetPackageScala = scalaSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
+    String targetPackageKotlin = kotlinSourceDir + modGroup.toString().replaceAll("\\.", "/") + "/" + mixinsPackage.toString().replaceAll("\\.", "/")
     if(!(getFile(targetPackageJava).exists() || getFile(targetPackageScala).exists() || getFile(targetPackageKotlin).exists())) {
         throw new GradleException("Could not resolve \"mixinsPackage\"! Could not find " + targetPackageJava + " or " + targetPackageScala  + " or " + targetPackageKotlin)
     }
@@ -621,6 +629,10 @@ task apiJar(type: Jar) {
             apiPackages.tokenize(';').forEach { pkg ->
                 include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/**'
             }
+        if (apiPackagesNoRecurse)
+            apiPackagesNoRecurse.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/*'
+            }
     }
 
     from (sourceSets.main.output) {
@@ -629,6 +641,10 @@ task apiJar(type: Jar) {
         if (apiPackages)
             apiPackages.tokenize(';').forEach { pkg ->
                 include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/**'
+            }
+        if (apiPackagesNoRecurse)
+            apiPackagesNoRecurse.tokenize(';').forEach { pkg ->
+                include modGroup.toString().replaceAll("\\.", "/") + "/" + pkg.toString().replaceAll("\\.", "/") + '/*'
             }
     }
 
@@ -650,7 +666,7 @@ compileJava.dependsOn(copySrgs)
 artifacts {
     archives sourcesJar
     archives devJar
-    if(apiPackage || apiPackages) {
+    if(apiPackage || apiPackages || apiPackagesNoRecurse) {
         archives apiJar
     }
 }
@@ -706,7 +722,7 @@ publishing {
                 artifact source: sourcesJar, classifier: "sources"
             }
             artifact source: usesShadowedDependencies.toBoolean() ? shadowDevJar : devJar, classifier: "dev"
-            if (apiPackage || apiPackages) {
+            if (apiPackage || apiPackages || apiPackagesNoRecurse) {
                 artifact source: apiJar, classifier: "api"
             }
 
