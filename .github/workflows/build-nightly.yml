@@ -1,11 +1,6 @@
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Build and test
+name: Build Nightly
 
 on:
-  pull_request:
-    branches: [ master, main ]
   push:
     branches: [ master, main ]
 
@@ -32,3 +27,9 @@ jobs:
 
     - name: Build the mod
       run: ./gradlew build
+
+    - name: Release Nightly
+      uses: actions/upload-artifact@v3
+      with:
+        name: nightly
+        path: build/libs/*.jar
