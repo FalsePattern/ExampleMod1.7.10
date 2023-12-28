@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern72
+//version: 1656003793falsepattern73
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -325,7 +325,7 @@ repositories {
     }
 }
 
-def unimixinsVersion = "0.1.14"
+def unimixinsVersion = "0.1.15"
 
 dependencies {
     if(usesMixins.toBoolean()) {
