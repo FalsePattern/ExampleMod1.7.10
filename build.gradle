@@ -1,4 +1,4 @@
-//version: 1656003793falsepattern73
+//version: 1656003793falsepattern74
 /*
 DO NOT CHANGE THIS FILE!
 
@@ -321,6 +321,10 @@ repositories {
         maven {
             name = "sponge2"
             url = "https://mvn.falsepattern.com/sponge"
+        }
+        maven {
+            name = "jitpack"
+            url = "https://mvn.falsepattern.com/jitpack/"
         }
     }
 }
